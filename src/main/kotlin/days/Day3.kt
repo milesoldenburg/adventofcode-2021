@@ -32,6 +32,30 @@ class Day3 {
     }
 
     fun part2(): Int {
-        return 0
+        var oxygenGeneratorRatings = this.measurements
+        var bitPosition = 0
+        while (oxygenGeneratorRatings.count() > 1) {
+            var setBits = 0
+            oxygenGeneratorRatings.forEach { if (it[bitPosition] == '1') setBits++ }
+            val mostCommonBit = if (setBits >= oxygenGeneratorRatings.count() - setBits) '1' else '0'
+            oxygenGeneratorRatings = oxygenGeneratorRatings.filter { it[bitPosition] == mostCommonBit } as MutableList<String>
+            bitPosition++
+        }
+
+        val oxygenGeneratorRating = Integer.parseInt(oxygenGeneratorRatings.first(), 2)
+
+        var co2ScrubberRatings = this.measurements
+        bitPosition = 0
+        while (co2ScrubberRatings.count() > 1) {
+            var setBits = 0
+            co2ScrubberRatings.forEach { if (it[bitPosition] == '1') setBits++ }
+            val leastCommonBit = if (setBits < co2ScrubberRatings.count() - setBits) '1' else '0'
+            co2ScrubberRatings = co2ScrubberRatings.filter { it[bitPosition] == leastCommonBit } as MutableList<String>
+            bitPosition++
+        }
+
+        val co2ScrubberRating = Integer.parseInt(co2ScrubberRatings.first(), 2)
+
+        return oxygenGeneratorRating * co2ScrubberRating
     }
 }
