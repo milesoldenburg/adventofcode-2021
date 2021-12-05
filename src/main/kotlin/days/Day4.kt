@@ -27,43 +27,73 @@ class Day4 {
             }
         }
 
-        val part1Value = part1()
+        //val part1Value = part1()
+        val part2Value = part2()
 
-        println("Part 1: $part1Value")
+        //println("Part 1: $part1Value")
+        println("Part 2: $part2Value")
     }
 
     private fun part1(): Int {
-        var winningBoardIndex = 0
         var winningDraw = 0
+        val winningBoards = mutableListOf<Array<Array<IntArray>>>()
         var hasFoundWinner = false
 
         while (!hasFoundWinner) {
+            winningBoards.clear()
             val drawing = this.drawings.removeFirst()
 
-            for ((boardIndex, board) in this.boards.withIndex()) {
+            for (board in this.boards) {
                 for (row in board) {
                     for ((spaceIndex, space) in row.withIndex()) {
                         if (space[0] == drawing) {
                             space[1] = 1
                             if (didRowWin(row) || didColumnWin(board, spaceIndex)) {
-                                winningBoardIndex = boardIndex
+                                winningBoards.add(board)
                                 hasFoundWinner = true
-                                winningDraw = drawing
                             }
                         }
                     }
                 }
             }
-        }
 
-        var unmarkedBoardSum = 0
-        for (row in this.boards[winningBoardIndex]) {
-            for (space in row) {
-                if (space[1] == 0) unmarkedBoardSum += space[0]
+            if (winningBoards.isNotEmpty()) {
+                this.boards.removeAll(winningBoards)
+                winningDraw = drawing
             }
         }
 
-        return unmarkedBoardSum * winningDraw
+        return computeBoardScore(winningBoards.first(), winningDraw)
+    }
+
+    private fun part2(): Int {
+        var winningDraw = 0
+        val winningBoards = mutableListOf<Array<Array<IntArray>>>()
+
+        while (this.boards.isNotEmpty()) {
+            winningBoards.clear()
+            val drawing = this.drawings.removeFirst()
+
+            for (board in this.boards) {
+                for (row in board) {
+                    for ((spaceIndex, space) in row.withIndex()) {
+                        if (space[0] == drawing) {
+                            space[1] = 1
+                            if (didRowWin(row) || didColumnWin(board, spaceIndex)) {
+                                winningBoards.add(board)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (winningBoards.isNotEmpty()) {
+                this.boards.removeAll(winningBoards)
+                winningDraw = drawing
+            }
+        }
+
+        return computeBoardScore(winningBoards.last(), winningDraw)
     }
 
     private fun didRowWin(row: Array<IntArray>): Boolean {
@@ -74,5 +104,16 @@ class Day4 {
     private fun didColumnWin(board: Array<Array<IntArray>>, columnIndex: Int): Boolean {
         val sum = board.fold(0) { acc, next -> acc + next[columnIndex][1] }
         return sum == 5
+    }
+
+    private fun computeBoardScore(winningBoard: Array<Array<IntArray>>, winningDraw: Int): Int {
+        var unmarkedBoardSum = 0
+        for (row in winningBoard) {
+            for (space in row) {
+                if (space[1] == 0) unmarkedBoardSum += space[0]
+            }
+        }
+
+        return unmarkedBoardSum * winningDraw
     }
 }
